@@ -1,0 +1,109 @@
+<!DOCTYPE html><html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pix Premiado</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #0b1f1a;
+      color: #fff;
+    }.capa {
+  width: 100%;
+  background: #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 0;
+}
+
+.capa img {
+  max-width: 100%;
+  max-height: 90vh;
+  object-fit: contain;
+  display: block;
+}
+
+.container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: auto;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+p {
+  text-align: center;
+  opacity: 0.9;
+}
+
+.numeros {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 10px;
+  margin-top: 30px;
+}
+
+.numero {
+  background: #1e3d32;
+  border-radius: 8px;
+  padding: 15px 0;
+  text-align: center;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.2s;
+  user-select: none;
+}
+
+.numero:hover {
+  background: #2e6b57;
+}
+
+.vendido {
+  background: #555 !important;
+  text-decoration: line-through;
+  cursor: not-allowed;
+}
+
+footer {
+  text-align: center;
+  padding: 20px;
+  font-size: 14px;
+  opacity: 0.7;
+}
+
+  </style>
+</head>
+<body>  <!-- CAPA -->  <div class="capa">
+    <img src="img1.jpg" alt="Pix Premiado" />
+  </div>  <div class="container">
+    <h1>Pix Premiado</h1>
+    <p>Escolha seu número da sorte de <strong>0001 a 2000</strong></p><div class="numeros" id="numeros"></div>
+
+  </div>  <footer>
+    © Pix Premiado – Todos os direitos reservados
+  </footer>  <script>
+    const container = document.getElementById('numeros');
+
+    for (let i = 1; i <= 2000; i++) {
+      const div = document.createElement('div');
+      div.className = 'numero';
+      div.textContent = i.toString().padStart(4, '0');
+
+      div.onclick = () => {
+        if (!div.classList.contains('vendido')) {
+          const confirmar = confirm(`Marcar o número ${div.textContent} como vendido?`);
+          if (confirmar) {
+            div.classList.add('vendido');
+          }
+        }
+      };
+
+      container.appendChild(div);
+    }
+  </script></body>
+</html>
