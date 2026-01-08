@@ -89,17 +89,30 @@ footer {
   </footer>  <script>
     const container = document.getElementById('numeros');
 
+    // Recupera números vendidos do LocalStorage
+    let vendidos = JSON.parse(localStorage.getItem('numerosVendidos')) || [];
+
+    function salvar() {
+      localStorage.setItem('numerosVendidos', JSON.stringify(vendidos));
+    }
+
     for (let i = 1; i <= 2000; i++) {
+      const numeroFormatado = i.toString().padStart(4, '0');
       const div = document.createElement('div');
       div.className = 'numero';
-      div.textContent = i.toString().padStart(4, '0');
+      div.textContent = numeroFormatado;
+
+      if (vendidos.includes(numeroFormatado)) {
+        div.classList.add('vendido');
+        div.textContent = numeroFormatado + ' ✖';
+      }
 
       div.onclick = () => {
-        if (!div.classList.contains('vendido')) {
-          const confirmar = confirm(`Marcar o número ${div.textContent} como vendido?`);
-          if (confirmar) {
-            div.classList.add('vendido');
-          }
+        if (!vendidos.includes(numeroFormatado)) {
+          vendidos.push(numeroFormatado);
+          salvar();
+          div.classList.add('vendido');
+          div.textContent = numeroFormatado + ' ✖';
         }
       };
 
