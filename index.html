@@ -2,96 +2,120 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pix Premiado</title>
-  <style>
+  <title>Pix Premiado</title>  <style>
     body {
       margin: 0;
       font-family: Arial, Helvetica, sans-serif;
       background: #0b1f1a;
       color: #fff;
-    }.capa {
-  width: 100%;
-  background: #000;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 10px 0;
-}
+    }
 
-.capa img {
-  max-width: 100%;
-  max-height: 90vh;
-  object-fit: contain;
-  display: block;
-}
+    .capa {
+      width: 100%;
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px 0;
+    }
 
-.container {
-  padding: 20px;
-  max-width: 1200px;
-  margin: auto;
-}
+    .capa img {
+      max-width: 100%;
+      max-height: 90vh;
+      object-fit: contain;
+      display: block;
+    }
 
-h1 {
-  text-align: center;
-  margin-bottom: 10px;
-}
+    .container {
+      padding: 20px;
+      max-width: 1200px;
+      margin: auto;
+    }
 
-p {
-  text-align: center;
-  opacity: 0.9;
-}
+    h1 {
+      text-align: center;
+      margin-bottom: 10px;
+    }
 
-.numeros {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-  gap: 10px;
-  margin-top: 30px;
-}
+    p {
+      text-align: center;
+      opacity: 0.9;
+    }
 
-.numero {
-  background: #1e3d32;
-  border-radius: 8px;
-  padding: 15px 0;
-  text-align: center;
-  cursor: pointer;
-  font-weight: bold;
-  transition: 0.2s;
-  user-select: none;
-}
+    #resetBtn {
+      margin: 15px auto;
+      display: block;
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      background: #c0392b;
+      color: #fff;
+      cursor: pointer;
+    }
 
-.numero:hover {
-  background: #2e6b57;
-}
+    #resetBtn:hover {
+      opacity: 0.9;
+    }
 
-.vendido {
-  background: #555 !important;
-  text-decoration: line-through;
-  cursor: not-allowed;
-}
+    .numeros {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+      gap: 10px;
+      margin-top: 30px;
+    }
 
-footer {
-  text-align: center;
-  padding: 20px;
-  font-size: 14px;
-  opacity: 0.7;
-}
+    .numero {
+      background: #1e3d32;
+      border-radius: 8px;
+      padding: 10px 5px;
+      text-align: center;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.2s;
+      user-select: none;
+      font-size: 14px;
+    }
 
-  </style>
-</head>
-<body>  <!-- CAPA -->  <div class="capa">
-    <img src="Img1.jpg" alt="Pix Premiado" />
+    .numero:hover {
+      background: #2e6b57;
+    }
+
+    .vendido {
+      background: #555 !important;
+      cursor: not-allowed;
+    }
+
+    .numero small {
+      display: block;
+      margin-top: 5px;
+      font-size: 11px;
+      opacity: 0.9;
+      word-break: break-word;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 14px;
+      opacity: 0.7;
+    }
+  </style></head>
+<body>  <div class="capa">
+    <img src="Img1.jpg" alt="Pix Premiado">
   </div>  <div class="container">
-    <button id="resetBtn" style="margin:15px auto;display:block;padding:10px 20px;font-size:16px;border:none;border-radius:8px;background:#c0392b;color:#fff;cursor:pointer;">Resetar números</button>
     <h1>Pix Premiado</h1>
-    <p>Escolha seu número da sorte de <strong>0001 a 2000</strong></p><div class="numeros" id="numeros"></div>
+    <p>Controle de números de <strong>0001 a 2000</strong></p><button id="resetBtn">Resetar números</button>
+
+<div class="numeros" id="numeros"></div>
 
   </div>  <footer>
-    © Pix Premiado – Todos os direitos reservados
+    © Pix Premiado – Controle do organizador
   </footer>  <script>
     const container = document.getElementById('numeros');
     const resetBtn = document.getElementById('resetBtn');
 
-    // Recupera números vendidos do LocalStorage
+    // Recupera números vendidos com nomes
     let vendidos = JSON.parse(localStorage.getItem('numerosVendidos')) || {};
     let contagemPorNome = {};
 
@@ -114,30 +138,23 @@ footer {
       }
     };
 
-    resetBtn.onclick = () => {
-      const confirmar = confirm('Tem certeza que deseja liberar todos os números?');
-      if (confirmar) {
-        localStorage.removeItem('numerosVendidos');
-        location.reload();
-      }
-    };
-
     contarPorNome();
 
     for (let i = 1; i <= 2000; i++) {
-      const numeroFormatado = i.toString().padStart(4, '0');
+      const numero = i.toString().padStart(4, '0');
       const div = document.createElement('div');
       div.className = 'numero';
-      div.textContent = numeroFormatado;
 
-      if (vendidos[numeroFormatado]) {
+      if (vendidos[numero]) {
         div.classList.add('vendido');
-        div.innerHTML = numeroFormatado + '<br><small>' + vendidos[numeroFormatado] + '</small>';
+        div.innerHTML = numero + '<br><small>' + vendidos[numero] + '</small>';
+      } else {
+        div.textContent = numero;
       }
 
       div.onclick = () => {
         if (!vendidos[numero]) {
-          const nome = prompt('Digite o nome da pessoa que escolheu o número (máx. 3 números por pessoa):');
+          const nome = prompt('Digite o nome da pessoa que comprou o número (máx. 3 números por pessoa):');
           if (!nome || nome.trim() === '') return;
 
           const nomeLimpo = nome.trim();
@@ -152,7 +169,7 @@ footer {
           contagemPorNome[nomeLimpo] = total + 1;
           salvar();
           div.classList.add('vendido');
-          div.innerHTML = numero + '<small>' + nomeLimpo + '</small>';
+          div.innerHTML = numero + '<br><small>' + nomeLimpo + '</small>';
         }
       };
 
