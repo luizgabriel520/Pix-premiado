@@ -92,11 +92,19 @@ footer {
     const resetBtn = document.getElementById('resetBtn');
 
     // Recupera números vendidos do LocalStorage
-    let vendidos = JSON.parse(localStorage.getItem('numerosVendidos')) || [];
+    let vendidos = JSON.parse(localStorage.getItem('numerosVendidos')) || {};
 
     function salvar() {
       localStorage.setItem('numerosVendidos', JSON.stringify(vendidos));
     }
+
+    resetBtn.onclick = () => {
+      const confirmar = confirm('Tem certeza que deseja liberar todos os números?');
+      if (confirmar) {
+        localStorage.removeItem('numerosVendidos');
+        location.reload();
+      }
+    };
 
     resetBtn.onclick = () => {
       const confirmar = confirm('Tem certeza que deseja liberar todos os números?');
@@ -112,17 +120,20 @@ footer {
       div.className = 'numero';
       div.textContent = numeroFormatado;
 
-      if (vendidos.includes(numeroFormatado)) {
+      if (vendidos[numeroFormatado]) {
         div.classList.add('vendido');
-        div.textContent = numeroFormatado + ' ✖';
+        div.innerHTML = numeroFormatado + '<br><small>' + vendidos[numeroFormatado] + '</small>';
       }
 
       div.onclick = () => {
-        if (!vendidos.includes(numeroFormatado)) {
-          vendidos.push(numeroFormatado);
-          salvar();
-          div.classList.add('vendido');
-          div.textContent = numeroFormatado + ' ✖';
+        if (!vendidos[numeroFormatado]) {
+          const nome = prompt('Digite o nome da pessoa que escolheu o número:');
+          if (nome && nome.trim() !== '') {
+            vendidos[numeroFormatado] = nome.trim();
+            salvar();
+            div.classList.add('vendido');
+            div.innerHTML = numeroFormatado + '<br><small>' + nome + '</small>';
+          }
         }
       };
 
