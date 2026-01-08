@@ -81,6 +81,7 @@ footer {
 <body>  <!-- CAPA -->  <div class="capa">
     <img src="Img1.jpg" alt="Pix Premiado" />
   </div>  <div class="container">
+    <button id="resetBtn" style="margin:15px auto;display:block;padding:10px 20px;font-size:16px;border:none;border-radius:8px;background:#c0392b;color:#fff;cursor:pointer;">Resetar números</button>
     <h1>Pix Premiado</h1>
     <p>Escolha seu número da sorte de <strong>0001 a 2000</strong></p><div class="numeros" id="numeros"></div>
 
@@ -88,6 +89,7 @@ footer {
     © Pix Premiado – Todos os direitos reservados
   </footer>  <script>
     const container = document.getElementById('numeros');
+    const resetBtn = document.getElementById('resetBtn');
 
     // Recupera números vendidos do LocalStorage
     let vendidos = JSON.parse(localStorage.getItem('numerosVendidos')) || [];
@@ -95,6 +97,14 @@ footer {
     function salvar() {
       localStorage.setItem('numerosVendidos', JSON.stringify(vendidos));
     }
+
+    resetBtn.onclick = () => {
+      const confirmar = confirm('Tem certeza que deseja liberar todos os números?');
+      if (confirmar) {
+        localStorage.removeItem('numerosVendidos');
+        location.reload();
+      }
+    };
 
     for (let i = 1; i <= 2000; i++) {
       const numeroFormatado = i.toString().padStart(4, '0');
