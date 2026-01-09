@@ -1,179 +1,81 @@
 <!DOCTYPE html><html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pix Premiado</title>  <style>
-    body {
-      margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
-      background: #0b1f1a;
-      color: #fff;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pix Premiado</title>
+<style>
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#0b1f1a;color:#fff}
+.capa{width:100%;background:#000;display:flex;justify-content:center;align-items:center;padding:10px 0}
+.capa img{max-width:100%;max-height:90vh;object-fit:contain}
+.container{padding:20px;max-width:1200px;margin:auto}
+h1{text-align:center}
+p{text-align:center;opacity:.9}
+button{padding:10px 20px;border:none;border-radius:8px;font-size:16px;cursor:pointer}
+#resetBtn{background:#c0392b;color:#fff;margin:10px}
+#sortearBtn{background:#27ae60;color:#fff;margin:10px}
+.botoes{text-align:center}
+.numeros{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:10px;margin-top:30px}
+.numero{background:#1e3d32;border-radius:8px;padding:10px 5px;text-align:center;font-weight:bold;cursor:pointer;font-size:14px}
+.numero:hover{background:#2e6b57}
+.vendido{background:#555!important;cursor:not-allowed}
+.numero small{display:block;margin-top:5px;font-size:11px;opacity:.9;word-break:break-word}
+.resultado{margin-top:30px;text-align:center;font-size:20px}
+footer{text-align:center;padding:20px;font-size:14px;opacity:.7}
+</style>
+</head>
+<body><div class="capa">
+<img src="Img1.jpg" alt="Pix Premiado">
+</div><div class="container">
+<h1>Pix Premiado</h1>
+<p>Controle e sorteio de números de <strong>0001 a 2000</strong></p><div class="botoes">
+<button id="resetBtn">Resetar números</button>
+<button id="sortearBtn">Sortear número</button>
+</div><div class="resultado" id="resultado"></div><div class="numeros" id="numeros"></div>
+</div><footer>© Pix Premiado – Controle do organizador</footer><script>
+const container=document.getElementById('numeros');
+const resetBtn=document.getElementById('resetBtn');
+const sortearBtn=document.getElementById('sortearBtn');
+const resultado=document.getElementById('resultado');
 
-    .capa {
-      width: 100%;
-      background: #000;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 10px 0;
-    }
+let vendidos=JSON.parse(localStorage.getItem('numerosVendidos'))||{};
 
-    .capa img {
-      max-width: 100%;
-      max-height: 90vh;
-      object-fit: contain;
-      display: block;
-    }
+function salvar(){localStorage.setItem('numerosVendidos',JSON.stringify(vendidos))}
 
-    .container {
-      padding: 20px;
-      max-width: 1200px;
-      margin: auto;
-    }
+function contarPorNome(){let c={};Object.values(vendidos).forEach(n=>{c[n]=(c[n]||0)+1});return c}
 
-    h1 {
-      text-align: center;
-      margin-bottom: 10px;
-    }
+resetBtn.onclick=()=>{if(confirm('Deseja resetar todos os números?')){localStorage.removeItem('numerosVendidos');location.reload()}}
 
-    p {
-      text-align: center;
-      opacity: 0.9;
-    }
+sortearBtn.onclick=()=>{
+const entries=Object.entries(vendidos);
+if(entries.length===0){alert('Nenhum número vendido ainda');return}
+const sorteado=entries[Math.floor(Math.random()*entries.length)];
+resultado.innerHTML=`🎉 Número sorteado: <strong>${sorteado[0]}</strong><br>👤 Ganhador: <strong>${sorteado[1]}</strong>`;
+}
 
-    #resetBtn {
-      margin: 15px auto;
-      display: block;
-      padding: 10px 20px;
-      font-size: 16px;
-      border: none;
-      border-radius: 8px;
-      background: #c0392b;
-      color: #fff;
-      cursor: pointer;
-    }
+for(let i=1;i<=2000;i++){
+const num=i.toString().padStart(4,'0');
+const div=document.createElement('div');
+div.className='numero';
 
-    #resetBtn:hover {
-      opacity: 0.9;
-    }
+if(vendidos[num]){
+div.classList.add('vendido');
+div.innerHTML=num+`<small>${vendidos[num]}</small>`
+}else{div.textContent=num}
 
-    .numeros {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-      gap: 10px;
-      margin-top: 30px;
-    }
 
-    .numero {
-      background: #1e3d32;
-      border-radius: 8px;
-      padding: 10px 5px;
-      text-align: center;
-      cursor: pointer;
-      font-weight: bold;
-      transition: 0.2s;
-      user-select: none;
-      font-size: 14px;
-    }
-
-    .numero:hover {
-      background: #2e6b57;
-    }
-
-    .vendido {
-      background: #555 !important;
-      cursor: not-allowed;
-    }
-
-    .numero small {
-      display: block;
-      margin-top: 5px;
-      font-size: 11px;
-      opacity: 0.9;
-      word-break: break-word;
-    }
-
-    footer {
-      text-align: center;
-      padding: 20px;
-      font-size: 14px;
-      opacity: 0.7;
-    }
-  </style></head>
-<body>  <div class="capa">
-    <img src="Img1.jpg" alt="Pix Premiado">
-  </div>  <div class="container">
-    <h1>Pix Premiado</h1>
-    <p>Controle de números de <strong>0001 a 2000</strong></p><button id="resetBtn">Resetar números</button>
-
-<div class="numeros" id="numeros"></div>
-
-  </div>  <footer>
-    © Pix Premiado – Controle do organizador
-  </footer>  <script>
-    const container = document.getElementById('numeros');
-    const resetBtn = document.getElementById('resetBtn');
-
-    // Recupera números vendidos com nomes
-    let vendidos = JSON.parse(localStorage.getItem('numerosVendidos')) || {};
-    let contagemPorNome = {};
-
-    function salvar() {
-      localStorage.setItem('numerosVendidos', JSON.stringify(vendidos));
-    }
-
-    function contarPorNome() {
-      contagemPorNome = {};
-      Object.values(vendidos).forEach(nome => {
-        contagemPorNome[nome] = (contagemPorNome[nome] || 0) + 1;
-      });
-    }
-
-    resetBtn.onclick = () => {
-      const confirmar = confirm('Tem certeza que deseja liberar todos os números?');
-      if (confirmar) {
-        localStorage.removeItem('numerosVendidos');
-        location.reload();
-      }
-    };
-
-    contarPorNome();
-
-    for (let i = 1; i <= 2000; i++) {
-      const numero = i.toString().padStart(4, '0');
-      const div = document.createElement('div');
-      div.className = 'numero';
-
-      if (vendidos[numero]) {
-        div.classList.add('vendido');
-        div.innerHTML = numero + '<br><small>' + vendidos[numero] + '</small>';
-      } else {
-        div.textContent = numero;
-      }
-
-      div.onclick = () => {
-        if (!vendidos[numero]) {
-          const nome = prompt('Digite o nome da pessoa que comprou o número (máx. 3 números por pessoa):');
-          if (!nome || nome.trim() === '') return;
-
-          const nomeLimpo = nome.trim();
-          const total = contagemPorNome[nomeLimpo] || 0;
-
-          if (total >= 3) {
-            alert('Esse nome já atingiu o limite de 3 números.');
-            return;
-          }
-
-          vendidos[numero] = nomeLimpo;
-          contagemPorNome[nomeLimpo] = total + 1;
-          salvar();
-          div.classList.add('vendido');
-          div.innerHTML = numero + '<br><small>' + nomeLimpo + '</small>';
-        }
-      };
-
-      container.appendChild(div);
-    }
-  </script></body>
+div.onclick=()=>{
+if(vendidos[num])return;
+const nome=prompt('Digite o nome do comprador (máx. 3 números por pessoa):');
+if(!nome||!nome.trim())return;
+const nomeLimpo=nome.trim();
+const contagem=contarPorNome();
+if((contagem[nomeLimpo]||0)>=3){alert('Esse nome já atingiu o limite de 3 números');return}
+vendidos[num]=nomeLimpo;
+sSalvar=salvar();
+div.classList.add('vendido');
+div.innerHTML=num+`<small>${nomeLimpo}</small>`
+}
+container.appendChild(div)
+}
+</script></body>
 </html>
