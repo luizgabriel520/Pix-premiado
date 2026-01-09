@@ -1,119 +1,150 @@
-<!DOCTYPE html><html lang="pt-BR">
+<!DOCTYPE html>
+<html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pix Premiado</title>
+<title>Painel do Organizador - Pix Premiado</title>
+
 <style>
-body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#0b1f1a;color:#fff}
-.capa{width:100%;background:#000;display:flex;justify-content:center;align-items:center;padding:10px 0}
-.capa img{max-width:100%;max-height:90vh;object-fit:contain}
-.container{padding:20px;max-width:1200px;margin:auto}
-h1{text-align:center}
-p{text-align:center;opacity:.9}
-button{padding:10px 20px;border:none;border-radius:8px;font-size:16px;cursor:pointer}
-#resetBtn{background:#c0392b;color:#fff;margin:5px}
-#sortearBtn{background:#27ae60;color:#fff;margin:5px}
-.botoes{text-align:center}
-.numeros{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:10px;margin-top:30px}
-.numero{background:#1e3d32;border-radius:8px;padding:10px 5px;text-align:center;font-weight:bold;cursor:pointer;font-size:14px}
-.numero:hover{background:#2e6b57}
-.vendido{background:#555!important;cursor:not-allowed}
-.numero small{display:block;margin-top:5px;font-size:11px;opacity:.9;word-break:break-word}
-.resultado{margin-top:20px;text-align:center;font-size:18px}
-.historico{margin-top:20px;background:#102d25;padding:15px;border-radius:8px}
-.historico h3{text-align:center;margin-top:0}
-.historico ul{list-style:none;padding:0}
-.historico li{margin-bottom:8px}
-footer{text-align:center;padding:20px;font-size:14px;opacity:.7}
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f4f4;
+  padding: 20px;
+}
+
+.login, .painel {
+  max-width: 900px;
+  margin: auto;
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+h1, h2 {
+  text-align: center;
+}
+
+input, button {
+  padding: 10px;
+  width: 100%;
+  margin-top: 10px;
+}
+
+button {
+  background: #2ecc71;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #27ae60;
+}
+
+.lista {
+  margin-top: 20px;
+}
+
+.numero {
+  padding: 8px;
+  border-bottom: 1px solid #ddd;
+}
+
+.sorteios {
+  margin-top: 30px;
+}
+
+.resultado {
+  background: #ecf0f1;
+  padding: 10px;
+  border-radius: 5px;
+  margin-top: 10px;
+}
 </style>
 </head>
-<body><div class="capa">
-<img src="Img1.jpg" alt="Pix Premiado">
-</div><div class="container">
-<h1>Pix Premiado</h1>
-<p>Controle e sorteio de números de <strong>0001 a 2000</strong></p><div class="botoes">
-<button id="resetBtn">Resetar tudo</button>
-<button id="sortearBtn">Sortear prêmio</button>
-</div><div class="resultado" id="resultado"></div><div class="historico" id="historico">
-<h3>Histórico de sorteios</h3>
-<ul id="listaHistorico"></ul>
-</div><div class="numeros" id="numeros"></div>
-</div><footer>© Pix Premiado – Controle do organizador</footer><script>
-const container=document.getElementById('numeros');
-const resetBtn=document.getElementById('resetBtn');
-const sortearBtn=document.getElementById('sortearBtn');
-const resultado=document.getElementById('resultado');
-const listaHistorico=document.getElementById('listaHistorico');
 
-let vendidos=JSON.parse(localStorage.getItem('numerosVendidos'))||{};
-let historico=JSON.parse(localStorage.getItem('historicoSorteios'))||[];
+<body>
 
-function salvar(){
-localStorage.setItem('numerosVendidos',JSON.stringify(vendidos));
-localStorage.setItem('historicoSorteios',JSON.stringify(historico));
+<div class="login" id="login">
+  <h1>Painel do Organizador</h1>
+  <input type="password" id="senha" placeholder="Digite a senha">
+  <button onclick="entrar()">Entrar</button>
+</div>
+
+<div class="painel" id="painel" style="display:none;">
+  <h1>Painel Pix Premiado</h1>
+
+  <div class="lista">
+    <h2>Números Vendidos</h2>
+    <div id="listaNumeros"></div>
+  </div>
+
+  <div class="sorteios">
+    <h2>Sorteios</h2>
+    <button onclick="sortear()">Realizar Sorteio</button>
+    <div id="resultados"></div>
+  </div>
+</div>
+
+<script>
+const SENHA = "admin123";
+let sorteiosRealizados = 0;
+const LIMITE_SORTEIOS = 15;
+
+function entrar() {
+  const senha = document.getElementById("senha").value;
+  if (senha === SENHA) {
+    document.getElementById("login").style.display = "none";
+    document.getElementById("painel").style.display = "block";
+    carregarNumeros();
+  } else {
+    alert("Senha incorreta");
+  }
 }
 
-function contarPorNome(){let c={};Object.values(vendidos).forEach(n=>{c[n]=(c[n]||0)+1});return c}
+function carregarNumeros() {
+  const dados = JSON.parse(localStorage.getItem("numerosPix")) || {};
+  const lista = document.getElementById("listaNumeros");
+  lista.innerHTML = "";
 
-resetBtn.onclick=()=>{
-if(confirm('Deseja resetar números e sorteios?')){
-localStorage.removeItem('numerosVendidos');
-localStorage.removeItem('historicoSorteios');
-location.reload();
-}}
-
-sortearBtn.onclick=()=>{
-const entries=Object.entries(vendidos);
-if(entries.length===0){alert('Nenhum número disponível para sorteio');return}
-if(historico.length>=15){alert('Os 15 sorteios já foram realizados');return}
-const sorteado=entries[Math.floor(Math.random()*entries.length)];
-const premio=historico.length+1;
-historico.push({premio,numero:sorteado[0],nome:sorteado[1]});
-delete vendidos[sorteado[0]];
-salvar();
-resultado.innerHTML=`🎉 Prêmio ${premio}<br>Número: <strong>${sorteado[0]}</strong><br>Ganhador: <strong>${sorteado[1]}</strong>`;
-renderHistorico();
-renderNumeros();
+  Object.keys(dados).forEach(num => {
+    const div = document.createElement("div");
+    div.className = "numero";
+    div.innerHTML = `Número <b>${num}</b> - ${dados[num].nome} (${dados[num].whatsapp})`;
+    lista.appendChild(div);
+  });
 }
 
-function renderHistorico(){
-listaHistorico.innerHTML='';
-historico.forEach(h=>{
-const li=document.createElement('li');
-li.textContent=`Prêmio ${h.premio}: Nº ${h.numero} – ${h.nome}`;
-listaHistorico.appendChild(li);
-});
-}
+function sortear() {
+  if (sorteiosRealizados >= LIMITE_SORTEIOS) {
+    alert("Limite de 15 sorteios atingido");
+    return;
+  }
 
-function renderNumeros(){
-container.innerHTML='';
-for(let i=1;i<=2000;i++){
-const num=i.toString().padStart(4,'0');
-const div=document.createElement('div');
-div.className='numero';
-if(vendidos[num]){
-div.classList.add('vendido');
-div.innerHTML=num+`<small>${vendidos[num]}</small>`;
-div.onclick=()=>{};
-}else{
-div.textContent=num;
-div.onclick=()=>{
-const nome=prompt('Digite o nome do comprador (máx. 3 números por pessoa):');
-if(!nome||!nome.trim())return;
-const nomeLimpo=nome.trim();
-const contagem=contarPorNome();
-if((contagem[nomeLimpo]||0)>=3){alert('Esse nome já atingiu o limite de 3 números');return}
-vendidos[num]=nomeLimpo;
-salvar();
-div.classList.add('vendido');
-div.innerHTML=num+`<small>${nomeLimpo}</small>`;
-}
-}
-container.appendChild(div);
-}
-}
+  const dados = JSON.parse(localStorage.getItem("numerosPix")) || {};
+  const numeros = Object.keys(dados);
 
-renderHistorico();
-renderNumeros();
-</script></body>
+  if (numeros.length === 0) {
+    alert("Nenhum número vendido");
+    return;
+  }
+
+  const sorteado = numeros[Math.floor(Math.random() * numeros.length)];
+  sorteiosRealizados++;
+
+  const res = document.createElement("div");
+  res.className = "resultado";
+  res.innerHTML = `
+    <b>Sorteio ${sorteiosRealizados}</b><br>
+    Número: ${sorteado}<br>
+    Nome: ${dados[sorteado].nome}<br>
+    WhatsApp: ${dados[sorteado].whatsapp}
+  `;
+
+  document.getElementById("resultados").appendChild(res);
+}
+</script>
+
+</body>
 </html>
